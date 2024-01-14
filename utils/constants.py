@@ -22,7 +22,7 @@ PREPROCESSOR_DICT = {
     'canny': 'lllyasviel/control_v11p_sd15_canny',
     'depth_leres': 'lllyasviel/control_v11f1p_sd15_depth',
     'depth_leres++': 'lllyasviel/control_v11f1p_sd15_depth',
-    'depth_midas': 'lllyasviel/control_v11f1p_sd15_depth',
+    'depth_midas': 'diffusers/controlnet-depth-sdxl-1.0',#'lllyasviel/control_v11f1p_sd15_depth',
     'depth_zoe': 'lllyasviel/control_v11f1p_sd15_depth',
 }
 

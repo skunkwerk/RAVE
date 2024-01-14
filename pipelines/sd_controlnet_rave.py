@@ -8,7 +8,8 @@ warnings.filterwarnings("ignore")
 from transformers import set_seed
 from tqdm import tqdm
 from transformers import logging
-from diffusers import ControlNetModel, StableDiffusionControlNetImg2ImgPipeline, DDIMScheduler
+from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline, DDIMScheduler
+#StableDiffusionControlNetImg2ImgPipeline
 
 import torch.nn as nn
 import numpy as np
@@ -38,7 +39,7 @@ class RAVE(nn.Module):
     def __init_pipe(self, hf_cn_path, hf_path):
         controlnet = ControlNetModel.from_pretrained(hf_cn_path, torch_dtype=self.dtype).to(self.device, self.dtype)
 
-        pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(hf_path, controlnet=controlnet, torch_dtype=self.dtype).to(self.device, self.dtype) 
+        pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(hf_path, controlnet=controlnet, torch_dtype=self.dtype).to(self.device, self.dtype) 
         pipe.enable_model_cpu_offload()
         pipe.enable_xformers_memory_efficient_attention()
         return pipe
