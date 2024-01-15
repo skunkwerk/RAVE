@@ -8,8 +8,9 @@ warnings.filterwarnings("ignore")
 from transformers import set_seed
 from tqdm import tqdm
 from transformers import logging
-from diffusers import ControlNetModel, StableDiffusionXLControlNetImg2ImgPipeline, DDIMScheduler
-#StableDiffusionControlNetImg2ImgPipeline
+from diffusers import LCMScheduler
+from diffusers import ControlNetModel, StableDiffusionControlNetImg2ImgPipeline, DDIMScheduler
+#StableDiffusionXLControlNetImg2ImgPipeline
 
 import torch.nn as nn
 import numpy as np
@@ -39,9 +40,10 @@ class RAVE(nn.Module):
     def __init_pipe(self, hf_cn_path, hf_path):
         controlnet = ControlNetModel.from_pretrained(hf_cn_path, torch_dtype=self.dtype).to(self.device, self.dtype)
 
-        pipe = StableDiffusionXLControlNetImg2ImgPipeline.from_pretrained(hf_path, controlnet=controlnet, torch_dtype=self.dtype).to(self.device, self.dtype) 
+        pipe = StableDiffusionControlNetImg2ImgPipeline.from_pretrained(hf_path, controlnet=controlnet, torch_dtype=self.dtype).to(self.device, self.dtype) 
         pipe.enable_model_cpu_offload()
         pipe.enable_xformers_memory_efficient_attention()
+        pipe.load_lora_weights("latent-consistency/lcm-lora-sdv1-5")
         return pipe
         
     @torch.no_grad()
@@ -400,7 +402,8 @@ class RAVE(nn.Module):
         img_batch, control_batch = self.process_image_batch(input_dict['image_pil_list'])
         init_latents_pre = self.encode_imgs(img_batch)
         
-        self.scheduler = DDIMScheduler.from_config(self.scheduler_config)
+        #self.scheduler = DDIMScheduler.from_config(self.scheduler_config)
+        self.scheduler = LCMScheduler.from_config(self.scheduler_config)
         self.scheduler.set_timesteps(self.num_inference_steps, device=self.device)
         self.inv_cond_embeddings, self.inv_uncond_embeddings = self.get_text_embeds(self.inversion_prompt, "")
         if self.is_ddim_inversion:
